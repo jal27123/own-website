@@ -6,100 +6,97 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>                   
-
-  <!-- 7: Hier kommt der sichtbare Inhalt -->
   <h1>Hallo Welt!</h1>
   <p>Das ist meine erste Website XXD.</p>
-    <button onclick="Datumanzeigen()">Datum anzeigen</button>
-    <p id="datum"></p>
 
+  <!-- Datum -->
+  <button onclick="Datumanzeigen()">Datum anzeigen</button>
+  <p id="datum"></p>
 
-    <p>Hier dann noch den Namen bitte!</p>
-    <button onclick="NamenEintragen()">Name eintragen</button>
+  <!-- Gästebuch -->
+  <p>Hier dann noch den Namen bitte!</p>
+  <button onclick="NamenEintragen()">Name eintragen</button>
 
-    <table id="namensTabelle" border="1">
-      <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Datum</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
+  <table id="namensTabelle" border="1">
+    <thead>
+      <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Datum</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
+  <button onclick="gaestebuchZuruecksetzen()">Gästebuch zurücksetzen</button>
 
-    <button onclick="gaestebuchZuruecksetzen()">Gästebuch zurücksetzen</button> <!-- Neu -->
-    <h2>Mein Lebenslauf als PDF</h2>
-    <a href="docs/Lebenslauf.pdf" download>Lebenslauf herunterladen</a>
+  <h2>Mein Lebenslauf als PDF</h2>
+  <a href="docs/Lebenslauf.pdf" download>Lebenslauf herunterladen</a>
 
-    <!-- Firebase + Gästebuch-Script -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- Firebase + Gästebuch-Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyB71j-IlAgZqGIwq1m6om4BPFcM4WRbU",
-        authDomain: "guestbook-6b96f.firebaseapp.com",
-        projectId: "guestbook-6b96f",
-        storageBucket: "guestbook-6b96f.appspot.com",
-        messagingSenderId: "10012619539",
-        appId: "1:10012619539:web:bd9bc7a0961ee8105af186",
-        measurementId: "G-JNRCQVE1VW"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyB71j-IlAgZqGIwq1m6om4BPFcM4WRbU",
+      authDomain: "guestbook-6b96f.firebaseapp.com",
+      projectId: "guestbook-6b96f",
+      storageBucket: "guestbook-6b96f.appspot.com",
+      messagingSenderId: "10012619539",
+      appId: "1:10012619539:web:bd9bc7a0961ee8105af186",
+      measurementId: "G-JNRCQVE1VW"
+    };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-      async function NamenEintragen() {
-        const name = prompt("Bitte Namen eingeben:");
-        if (!name) return;
-        await addDoc(collection(db, "gaestebuch"), {
-          name: name,
-          datum: new Date().toLocaleString()
-        });
-        ladeEintraege();
+    async function NamenEintragen() {
+      const name = prompt("Bitte Namen eingeben:");
+      if (!name) return;
+      await addDoc(collection(db, "gaestebuch"), {
+        name: name,
+        datum: new Date().toLocaleString()
+      });
+      ladeEintraege();
+    }
+
+    async function ladeEintraege() {
+      const querySnapshot = await getDocs(collection(db, "gaestebuch"));
+      const tbody = document.querySelector("#namensTabelle tbody");
+      tbody.innerHTML = "";
+      let counter = 1;
+      querySnapshot.forEach((docSnap) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${counter++}</td>
+          <td>${docSnap.data().name}</td>
+          <td>${docSnap.data().datum}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function gaestebuchZuruecksetzen() {
+      if (!confirm("Gästebuch wirklich zurücksetzen?")) return;
+      const querySnapshot = await getDocs(collection(db, "gaestebuch"));
+      for (const docSnap of querySnapshot.docs) {
+        await deleteDoc(doc(db, "gaestebuch", docSnap.id));
       }
+      ladeEintraege();
+    }
 
-      async function ladeEintraege() {
-        const querySnapshot = await getDocs(collection(db, "gaestebuch"));
-        const tbody = document.querySelector("#namensTabelle tbody");
-        tbody.innerHTML = "";
-        let counter = 1;
-        querySnapshot.forEach((docSnap) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${counter++}</td>
-            <td>${docSnap.data().name}</td>
-            <td>${docSnap.data().datum}</td>`;
-          tbody.appendChild(tr);
-        });
-      }
+    function Datumanzeigen() {
+      let ausgabe = document.getElementById("datum");
+      ausgabe.textContent = "Heute ist: " + new Date().toLocaleDateString();
+    }
 
-      async function gaestebuchZuruecksetzen() {
-        const querySnapshot = await getDocs(collection(db, "gaestebuch"));
-        for (const docSnap of querySnapshot.docs) {
-          await deleteDoc(doc(db, "gaestebuch", docSnap.id));
-        }
-        ladeEintraege();
-      }
+    // Global machen, damit HTML-Buttons sie finden
+    window.NamenEintragen = NamenEintragen;
+    window.gaestebuchZuruecksetzen = gaestebuchZuruecksetzen;
+    window.Datumanzeigen = Datumanzeigen;
+    window.ladeEintraege = ladeEintraege;
 
-      // Datum-Anzeige-Funktion ergänzen
-      function Datumanzeigen() {
-        let ausgabe = document.getElementById("datum");
-        ausgabe.textContent = "Heute ist: " + new Date().toLocaleDateString();
-      }
-
-      // Funktionen global machen
-      window.NamenEintragen = NamenEintragen;
-      window.gaestebuchZuruecksetzen = gaestebuchZuruecksetzen;
-      window.Datumanzeigen = Datumanzeigen;
-      window.ladeEintraege = ladeEintraege;
-
-      // Lädt die Einträge automatisch, wenn die Seite geladen wird
-      window.onload = ladeEintraege;
-    </script>
-
+    window.onload = ladeEintraege;
+  </script>
 </body>
 </html>
