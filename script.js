@@ -39,10 +39,16 @@ function namenTabelleAktualisieren() {
 // Gästebuch zurücksetzen (alle Einträge löschen)
 function gaestebuchZuruecksetzen() {
     if (confirm("Gästebuch wirklich zurücksetzen?")) {
-        localStorage.removeItem("gaestebuchNamen");
-        namenTabelleAktualisieren();
+        let pin = prompt("Bitte PIN zum Zurücksetzen eingeben:");
+        if (pin === "4711") {
+            localStorage.removeItem("gaestebuchNamen");
+            namenTabelleAktualisieren();
+            alert("Gästebuch wurde zurückgesetzt.");
+        } else {
+            alert("Falsche PIN. Vorgang abgebrochen.");
+        }
     }
+}
 
 // Beim Laden der Seite Tabelle füllen
 window.onload = namenTabelleAktualisieren;
-}
