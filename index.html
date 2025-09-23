@@ -1,0 +1,38 @@
+<!DOCTYPE html>         
+<html lang="de">         
+<head>                   
+  <meta charset="UTF-8">  
+  <title>Meine Seite</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>                   
+
+  <!-- 7: Hier kommt der sichtbare Inhalt -->
+  <h1>Hallo Welt!</h1>
+  <p>Das ist meine erste Website.</p>
+    <button onclick="Datumanzeigen()">Datum anzeigen</button>
+    <p id="datum"></p>
+    <script src="script.js"></script> <!-- 8 -->
+
+
+    <p>Hier dann noch den Namen bitte!</p>
+    <button onclick="NamenEintragen()">Name eintragen</button>
+
+    <table id="namensTabelle" border="1">
+      <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Datum</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <script src="namen.js"></script> <!-- 9 -->
+    <button onclick="gaestebuchZuruecksetzen()">Gästebuch zurücksetzen</button> <!-- Neu -->
+    
+
+</body>
+</html>

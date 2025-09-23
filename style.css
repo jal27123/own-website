@@ -1,0 +1,14 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+#datum {
+  color: #0074D9; /* z.B. Blau */
+  font-weight: bold;
+  min-height: 1.5em; 
+}
