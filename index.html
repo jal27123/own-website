@@ -85,6 +85,18 @@
         ladeEintraege();
       }
 
+      // Datum-Anzeige-Funktion ergänzen
+      function Datumanzeigen() {
+        let ausgabe = document.getElementById("datum");
+        ausgabe.textContent = "Heute ist: " + new Date().toLocaleDateString();
+      }
+
+      // Funktionen global machen
+      window.NamenEintragen = NamenEintragen;
+      window.gaestebuchZuruecksetzen = gaestebuchZuruecksetzen;
+      window.Datumanzeigen = Datumanzeigen;
+      window.ladeEintraege = ladeEintraege;
+
       // Lädt die Einträge automatisch, wenn die Seite geladen wird
       window.onload = ladeEintraege;
     </script>
