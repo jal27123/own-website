@@ -3,20 +3,21 @@
 <head>                   
   <meta charset="UTF-8">  
   <title>Meine Seite</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"> <!-- Verknüpft eine externe CSS-Datei -->
 </head>
 <body>                   
   <h1>Hallo Welt!</h1>
   <p>Das ist meine erste Website XXD.</p>
 
-  <!-- Datum -->
+  <!-- Button, um das aktuelle Datum anzuzeigen -->
   <button onclick="Datumanzeigen()">Datum anzeigen</button>
-  <p id="datum"></p>
+  <p id="datum"></p> <!-- Hier wird das Datum angezeigt -->
 
-  <!-- Gästebuch -->
+  <!-- Gästebuch-Bereich -->
   <p>Hier dann noch den Namen bitte!</p>
-  <button onclick="NamenEintragen()">Name eintragen</button>
+  <button onclick="NamenEintragen()">Name eintragen</button> <!-- Öffnet ein Prompt zum Namen eintragen -->
 
+  <!-- Tabelle für Gästebucheinträge -->
   <table id="namensTabelle" border="1">
     <thead>
       <tr>
@@ -25,19 +26,23 @@
           <th>Datum</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody></tbody> <!-- Hier werden die Einträge dynamisch eingefügt -->
   </table>
 
+  <!-- Button, um das Gästebuch zurückzusetzen (alle Einträge löschen) -->
   <button onclick="gaestebuchZuruecksetzen()">Gästebuch zurücksetzen</button>
 
+  <!-- Download-Link für deinen Lebenslauf -->
   <h2>Mein Lebenslauf als PDF</h2>
   <a href="docs/Lebenslauf.pdf" download>Lebenslauf herunterladen</a>
 
   <!-- Firebase + Gästebuch-Script -->
   <script type="module">
+    // Importiere benötigte Firebase-Module direkt aus dem CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    // Deine Firebase-Konfiguration (Projekt-spezifisch)
     const firebaseConfig = {
       apiKey: "AIzaSyB71j-IlAgZqGIwq1m6om4BPFcM4WRbU",
       authDomain: "guestbook-6b96f.firebaseapp.com",
@@ -48,23 +53,26 @@
       measurementId: "G-JNRCQVE1VW"
     };
 
+    // Initialisiere Firebase-App und Firestore-Datenbank
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Funktion zum Namen eintragen (öffnet Prompt, speichert in Firestore)
     async function NamenEintragen() {
-      const name = prompt("Bitte Namen eingeben:");
-      if (!name) return;
+      const name = prompt("Bitte Namen eingeben:"); 
+      if (!name) return; // Abbrechen, falls kein Name eingegeben wurde
       await addDoc(collection(db, "gaestebuch"), {
         name: name,
-        datum: new Date().toLocaleString()
+        datum: new Date().toLocaleString() // Aktuelles Datum/Uhrzeit
       });
-      ladeEintraege();
+      ladeEintraege(); // Tabelle neu laden
     }
 
+    // Funktion zum Laden und Anzeigen aller Gästebucheinträge
     async function ladeEintraege() {
       const querySnapshot = await getDocs(collection(db, "gaestebuch"));
       const tbody = document.querySelector("#namensTabelle tbody");
-      tbody.innerHTML = "";
+      tbody.innerHTML = ""; // Tabelle leeren
       let counter = 1;
       querySnapshot.forEach((docSnap) => {
         const tr = document.createElement("tr");
@@ -72,30 +80,33 @@
           <td>${counter++}</td>
           <td>${docSnap.data().name}</td>
           <td>${docSnap.data().datum}</td>`;
-        tbody.appendChild(tr);
+        tbody.appendChild(tr); // Zeile zur Tabelle hinzufügen
       });
     }
 
+    // Funktion zum Zurücksetzen des Gästebuchs (alle Einträge löschen)
     async function gaestebuchZuruecksetzen() {
-      if (!confirm("Gästebuch wirklich zurücksetzen?")) return;
+      if (!confirm("Gästebuch wirklich zurücksetzen?")) return; // Sicherheitsabfrage
       const querySnapshot = await getDocs(collection(db, "gaestebuch"));
       for (const docSnap of querySnapshot.docs) {
-        await deleteDoc(doc(db, "gaestebuch", docSnap.id));
+        await deleteDoc(doc(db, "gaestebuch", docSnap.id)); // Jeden Eintrag löschen
       }
-      ladeEintraege();
+      ladeEintraege(); // Tabelle neu laden
     }
 
+    // Funktion zum Anzeigen des aktuellen Datums im <p id="datum">
     function Datumanzeigen() {
       let ausgabe = document.getElementById("datum");
       ausgabe.textContent = "Heute ist: " + new Date().toLocaleDateString();
     }
 
-    // Global machen, damit HTML-Buttons sie finden
+    // Funktionen global machen, damit sie von den Buttons aufgerufen werden können
     window.NamenEintragen = NamenEintragen;
     window.gaestebuchZuruecksetzen = gaestebuchZuruecksetzen;
     window.Datumanzeigen = Datumanzeigen;
     window.ladeEintraege = ladeEintraege;
 
+    // Beim Laden der Seite alle Einträge anzeigen
     window.onload = ladeEintraege;
   </script>
 </body>
